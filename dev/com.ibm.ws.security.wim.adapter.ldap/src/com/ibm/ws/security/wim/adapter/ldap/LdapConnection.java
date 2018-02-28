@@ -10,39 +10,6 @@
  *******************************************************************************/
 package com.ibm.ws.security.wim.adapter.ldap;
 
-import static com.ibm.websphere.security.wim.ConfigConstants.ATTRIBUTES_CACHE_CONFIG;
-import static com.ibm.websphere.security.wim.ConfigConstants.CACHE_CONFIG;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_CONTEXT_POOL;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_IGNORE_CASE;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_ALLOW_WRITE_TO_SECONDARY_SERVERS;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_ATTRIBUTE_RANGE_STEP;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_ATTRIBUTE_SIZE_LIMIT;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_BIND_DN;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_BIND_PASSWORD;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_CACHE_SIZE;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_CACHE_TIME_OUT;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_CONNECT_TIMEOUT;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_ENABLED;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_HOST;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_INIT_POOL_SIZE;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_MAX_POOL_SIZE;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_POOL_TIME_OUT;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_POOL_WAIT_TIME;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_PORT;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_PREF_POOL_SIZE;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_PRIMARY_SERVER_QUERY_TIME_INTERVAL;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_REFERAL;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_REFERRAL;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_RETURN_TO_PRIMARY_SERVER;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_SEARCH_COUNT_LIMIT;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_SEARCH_PAGE_SIZE;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_SEARCH_RESULTS_SIZE_LIMIT;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_SEARCH_TIME_OUT;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_SERVER_TTL_ATTRIBUTE;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_PROP_SSL_ENABLED;
-import static com.ibm.websphere.security.wim.ConfigConstants.CONFIG_REUSE_CONNECTION;
-import static com.ibm.websphere.security.wim.ConfigConstants.SEARCH_CACHE_CONFIG;
-
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -573,26 +540,26 @@ public class LdapConnection {
         initializeCaches(configProps);
 
         // Ignore case.
-        ignoreDNCase = (Boolean) configProps.get(CONFIG_IGNORE_CASE);
+        ignoreDNCase = (Boolean) configProps.get(LdapConstants.CONFIG_IGNORE_CASE);
         if (tc.isDebugEnabled())
             Tr.debug(tc, "Set ignoreDNCase as [" + ignoreDNCase + "]");
     }
 
     private void initializeCaches(Map<String, Object> configProps) {
         final String METHODNAME = "initializeCaches(DataObject)";
-        List<Map<String, Object>> cacheConfigs = Nester.nest(CACHE_CONFIG, configProps);
+        List<Map<String, Object>> cacheConfigs = Nester.nest(LdapConstants.CACHE_CONFIG, configProps);
 
         Map<String, Object> attrCacheConfig = null;
         Map<String, Object> searchResultsCacheConfig = null;
 
         if (!cacheConfigs.isEmpty()) {
             Map<String, Object> cacheConfig = cacheConfigs.get(0);
-            Map<String, List<Map<String, Object>>> cacheInfo = Nester.nest(cacheConfig, ATTRIBUTES_CACHE_CONFIG, SEARCH_CACHE_CONFIG);
-            List<Map<String, Object>> attrList = cacheInfo.get(ATTRIBUTES_CACHE_CONFIG);
+            Map<String, List<Map<String, Object>>> cacheInfo = Nester.nest(cacheConfig, LdapConstants.ATTRIBUTES_CACHE_CONFIG, LdapConstants.SEARCH_CACHE_CONFIG);
+            List<Map<String, Object>> attrList = cacheInfo.get(LdapConstants.ATTRIBUTES_CACHE_CONFIG);
             if (!attrList.isEmpty()) {
                 attrCacheConfig = attrList.get(0);
             }
-            List<Map<String, Object>> searchList = cacheInfo.get(SEARCH_CACHE_CONFIG);
+            List<Map<String, Object>> searchList = cacheInfo.get(LdapConstants.SEARCH_CACHE_CONFIG);
             if (!searchList.isEmpty()) {
                 searchResultsCacheConfig = searchList.get(0);
             }
@@ -600,13 +567,13 @@ public class LdapConnection {
             // iDiskOffLoad  = Boolean.parseBoolean((String)cacheConfig.get(ConfigConstants.CONFIG_PROP_CACHES_DISK_OFF_LOAD));
 
             if (attrCacheConfig != null) {
-                iAttrsCacheEnabled = (Boolean) attrCacheConfig.get(CONFIG_PROP_ENABLED);
+                iAttrsCacheEnabled = (Boolean) attrCacheConfig.get(LdapConstants.CONFIG_PROP_ENABLED);
                 if (iAttrsCacheEnabled) {
                     // Initialize the Attributes Cache size
-                    iAttrsCacheSize = (Integer) attrCacheConfig.get(CONFIG_PROP_CACHE_SIZE);
-                    iAttrsCacheTimeOut = (Long) attrCacheConfig.get(CONFIG_PROP_CACHE_TIME_OUT);
-                    iAttrsSizeLmit = (Integer) attrCacheConfig.get(CONFIG_PROP_ATTRIBUTE_SIZE_LIMIT);
-                    iServerTTLAttr = (String) attrCacheConfig.get(CONFIG_PROP_SERVER_TTL_ATTRIBUTE);
+                    iAttrsCacheSize = (Integer) attrCacheConfig.get(LdapConstants.CONFIG_PROP_CACHE_SIZE);
+                    iAttrsCacheTimeOut = (Long) attrCacheConfig.get(LdapConstants.CONFIG_PROP_CACHE_TIME_OUT);
+                    iAttrsSizeLmit = (Integer) attrCacheConfig.get(LdapConstants.CONFIG_PROP_ATTRIBUTE_SIZE_LIMIT);
+                    iServerTTLAttr = (String) attrCacheConfig.get(LdapConstants.CONFIG_PROP_SERVER_TTL_ATTRIBUTE);
 
 /*
  * TODO:: Cache Distribution is not yet needed.
@@ -620,12 +587,12 @@ public class LdapConnection {
             }
 
             if (searchResultsCacheConfig != null) {
-                iSearchResultsCacheEnabled = (Boolean) searchResultsCacheConfig.get(CONFIG_PROP_ENABLED);
+                iSearchResultsCacheEnabled = (Boolean) searchResultsCacheConfig.get(LdapConstants.CONFIG_PROP_ENABLED);
                 if (iSearchResultsCacheEnabled) {
                     // Initialize the Search Results Cache size
-                    iSearchResultsCacheSize = (Integer) searchResultsCacheConfig.get(CONFIG_PROP_CACHE_SIZE);
-                    iSearchResultsCacheTimeOut = (Long) searchResultsCacheConfig.get(CONFIG_PROP_CACHE_TIME_OUT);
-                    iSearchResultSizeLmit = (Integer) searchResultsCacheConfig.get(CONFIG_PROP_SEARCH_RESULTS_SIZE_LIMIT);
+                    iSearchResultsCacheSize = (Integer) searchResultsCacheConfig.get(LdapConstants.CONFIG_PROP_CACHE_SIZE);
+                    iSearchResultsCacheTimeOut = (Long) searchResultsCacheConfig.get(LdapConstants.CONFIG_PROP_CACHE_TIME_OUT);
+                    iSearchResultSizeLmit = (Integer) searchResultsCacheConfig.get(LdapConstants.CONFIG_PROP_SEARCH_RESULTS_SIZE_LIMIT);
 
 /*
  * TODO:: Cache Distribution is not yet needed.
@@ -709,7 +676,7 @@ public class LdapConnection {
         final String METHODNAME = "initializeContextPool(DataObject)";
         iEnableContextPool = true;
 
-        List<Map<String, Object>> poolConfigs = Nester.nest(CONFIG_CONTEXT_POOL, configProps);
+        List<Map<String, Object>> poolConfigs = Nester.nest(LdapConstants.CONFIG_CONTEXT_POOL, configProps);
 
         Map<String, Object> poolConfig = null;
         if (!poolConfigs.isEmpty()) {
@@ -717,12 +684,12 @@ public class LdapConnection {
         }
 
         // Reuse Connection.
-        boolean reuseConn = (Boolean) configProps.get(CONFIG_REUSE_CONNECTION);
+        boolean reuseConn = (Boolean) configProps.get(LdapConstants.CONFIG_REUSE_CONNECTION);
         if (tc.isDebugEnabled())
             Tr.debug(tc, "Set reuseConnection as [" + reuseConn + "]");
 
         if (poolConfig != null) {
-            iEnableContextPool = (Boolean) poolConfig.get(CONFIG_PROP_ENABLED);
+            iEnableContextPool = (Boolean) poolConfig.get(LdapConstants.CONFIG_PROP_ENABLED);
         }
 
         if (!reuseConn)
@@ -732,14 +699,14 @@ public class LdapConnection {
 
         if (iEnableContextPool) {
             if (poolConfig != null) {
-                if (poolConfig.get(CONFIG_PROP_INIT_POOL_SIZE) != null) {
-                    iInitPoolSize = (Integer) poolConfig.get((CONFIG_PROP_INIT_POOL_SIZE));
+                if (poolConfig.get(LdapConstants.CONFIG_PROP_INIT_POOL_SIZE) != null) {
+                    iInitPoolSize = (Integer) poolConfig.get((LdapConstants.CONFIG_PROP_INIT_POOL_SIZE));
                 }
-                if (poolConfig.get(CONFIG_PROP_MAX_POOL_SIZE) != null) {
-                    iMaxPoolSize = (Integer) poolConfig.get((CONFIG_PROP_MAX_POOL_SIZE));
+                if (poolConfig.get(LdapConstants.CONFIG_PROP_MAX_POOL_SIZE) != null) {
+                    iMaxPoolSize = (Integer) poolConfig.get((LdapConstants.CONFIG_PROP_MAX_POOL_SIZE));
                 }
-                if (poolConfig.get(CONFIG_PROP_PREF_POOL_SIZE) != null) {
-                    iPrefPoolSize = (Integer) poolConfig.get((CONFIG_PROP_PREF_POOL_SIZE));
+                if (poolConfig.get(LdapConstants.CONFIG_PROP_PREF_POOL_SIZE) != null) {
+                    iPrefPoolSize = (Integer) poolConfig.get((LdapConstants.CONFIG_PROP_PREF_POOL_SIZE));
                 }
                 if (iMaxPoolSize != 0 && iMaxPoolSize < iInitPoolSize) {
                     String msg = Tr.formatMessage(tc, WIMMessageKey.INIT_POOL_SIZE_TOO_BIG,
@@ -751,8 +718,8 @@ public class LdapConnection {
                                                   WIMMessageHelper.generateMsgParms(Integer.valueOf(iInitPoolSize), Integer.valueOf(iMaxPoolSize)));
                     throw new InvalidInitPropertyException(WIMMessageKey.PREF_POOL_SIZE_TOO_BIG, msg);
                 }
-                if (poolConfig.get(CONFIG_PROP_POOL_TIME_OUT) != null) {
-                    providedPoolTimeOut = (Long) poolConfig.get((CONFIG_PROP_POOL_TIME_OUT));
+                if (poolConfig.get(LdapConstants.CONFIG_PROP_POOL_TIME_OUT) != null) {
+                    providedPoolTimeOut = (Long) poolConfig.get((LdapConstants.CONFIG_PROP_POOL_TIME_OUT));
 
                     /**
                      * The metatype is set to long for this property and all
@@ -767,8 +734,8 @@ public class LdapConnection {
                         iPoolTimeOut = roundToSeconds(providedPoolTimeOut);
                     }
                 }
-                if (poolConfig.get(CONFIG_PROP_POOL_WAIT_TIME) != null) {
-                    iPoolWaitTime = (Long) poolConfig.get((CONFIG_PROP_POOL_WAIT_TIME));
+                if (poolConfig.get(LdapConstants.CONFIG_PROP_POOL_WAIT_TIME) != null) {
+                    iPoolWaitTime = (Long) poolConfig.get((LdapConstants.CONFIG_PROP_POOL_WAIT_TIME));
                 }
             }
             if (tc.isDebugEnabled()) {
@@ -791,23 +758,23 @@ public class LdapConnection {
         /*
          * Set ldapTimeout
          */
-        if (configProps.containsKey(CONFIG_PROP_SEARCH_TIME_OUT)) {
-            long val = Long.parseLong(String.valueOf(configProps.get(CONFIG_PROP_SEARCH_TIME_OUT)));
+        if (configProps.containsKey(LdapConstants.CONFIG_PROP_SEARCH_TIME_OUT)) {
+            long val = Long.parseLong(String.valueOf(configProps.get(LdapConstants.CONFIG_PROP_SEARCH_TIME_OUT)));
             iTimeLimit = (int) val;
         }
 
         /*
          * Set ldapCountLimit
          */
-        if (configProps.containsKey(CONFIG_PROP_SEARCH_COUNT_LIMIT)) {
-            iCountLimit = (int) configProps.get(CONFIG_PROP_SEARCH_COUNT_LIMIT);
+        if (configProps.containsKey(LdapConstants.CONFIG_PROP_SEARCH_COUNT_LIMIT)) {
+            iCountLimit = (int) configProps.get(LdapConstants.CONFIG_PROP_SEARCH_COUNT_LIMIT);
         }
 
         /*
          * Set search page size
          */
-        if (configProps.containsKey(CONFIG_PROP_SEARCH_PAGE_SIZE)) {
-            iPageSize = (int) configProps.get(CONFIG_PROP_SEARCH_PAGE_SIZE);
+        if (configProps.containsKey(LdapConstants.CONFIG_PROP_SEARCH_PAGE_SIZE)) {
+            iPageSize = (int) configProps.get(LdapConstants.CONFIG_PROP_SEARCH_PAGE_SIZE);
         } else {
             if (iLdapConfigMgr.getLdapType().startsWith("MICROSOFT ACTIVE DIRECTORY")) {
                 iPageSize = 1000;
@@ -817,8 +784,8 @@ public class LdapConnection {
         /*
          * Set attribute range step
          */
-        if (configProps.containsKey(CONFIG_PROP_ATTRIBUTE_RANGE_STEP)) {
-            iAttrRangeStep = Integer.parseInt((String) configProps.get(CONFIG_PROP_ATTRIBUTE_RANGE_STEP));
+        if (configProps.containsKey(LdapConstants.CONFIG_PROP_ATTRIBUTE_RANGE_STEP)) {
+            iAttrRangeStep = Integer.parseInt((String) configProps.get(LdapConstants.CONFIG_PROP_ATTRIBUTE_RANGE_STEP));
         } else {
             if (iLdapConfigMgr.getLdapType().equals("AD2000") || iLdapConfigMgr.getLdapType().equals("ADAM")) {
                 iAttrRangeStep = 1000;
@@ -829,9 +796,9 @@ public class LdapConnection {
             }
         }
 
-        iWriteToSecondary = Boolean.getBoolean((String) configProps.get(CONFIG_PROP_ALLOW_WRITE_TO_SECONDARY_SERVERS));
-        iReturnToPrimary = (Boolean) configProps.get(CONFIG_PROP_RETURN_TO_PRIMARY_SERVER);
-        iQueryInterval = (Integer) configProps.get(CONFIG_PROP_PRIMARY_SERVER_QUERY_TIME_INTERVAL) * 60;
+        iWriteToSecondary = Boolean.getBoolean((String) configProps.get(LdapConstants.CONFIG_PROP_ALLOW_WRITE_TO_SECONDARY_SERVERS));
+        iReturnToPrimary = (Boolean) configProps.get(LdapConstants.CONFIG_PROP_RETURN_TO_PRIMARY_SERVER);
+        iQueryInterval = (Integer) configProps.get(LdapConstants.CONFIG_PROP_PRIMARY_SERVER_QUERY_TIME_INTERVAL) * 60;
 
         // Initialize SSL settings
         initializeSSL(configProps);
@@ -839,7 +806,7 @@ public class LdapConnection {
         // Initialize servers
         List<Map<String, Object>> serversConfig = Nester.nest(FAILOVER_SERVERS, configProps);
 
-        boolean sslEnabled = (Boolean) configProps.get(CONFIG_PROP_SSL_ENABLED);
+        boolean sslEnabled = (Boolean) configProps.get(LdapConstants.CONFIG_PROP_SSL_ENABLED);
         iEnvironment = initializeEnvironmentProperties(sslEnabled, serversConfig, configProps);
     }
 
@@ -860,8 +827,8 @@ public class LdapConnection {
 
         List<String> urlList = new ArrayList<String>();
         // Extract the primary server.
-        String mainHost = (String) configProps.get(CONFIG_PROP_HOST);
-        int mainPort = (Integer) configProps.get(CONFIG_PROP_PORT);
+        String mainHost = (String) configProps.get(LdapConstants.CONFIG_PROP_HOST);
+        int mainPort = (Integer) configProps.get(LdapConstants.CONFIG_PROP_PORT);
 
         urlList.add(urlPrefix + mainHost.trim() + ":" + mainPort);
 
@@ -870,7 +837,7 @@ public class LdapConnection {
         for (Map<String, Object> serverConfig : serversConfig) {
             List<Map<String, Object>> servers = Nester.nest(SERVER2, serverConfig);
             for (Map<String, Object> server : servers) {
-                String ldapHost = (String) server.get(CONFIG_PROP_HOST);
+                String ldapHost = (String) server.get(LdapConstants.CONFIG_PROP_HOST);
 
                 if (!(ldapHost.startsWith("[") && ldapHost.endsWith("]"))) {
                     if (LdapHelper.isIPv6Addr(ldapHost)) {
@@ -878,8 +845,8 @@ public class LdapConnection {
                     }
                 }
 
-                if (server.get(CONFIG_PROP_PORT) != null) {
-                    int ldapPort = (Integer) server.get(CONFIG_PROP_PORT);
+                if (server.get(LdapConstants.CONFIG_PROP_PORT) != null) {
+                    int ldapPort = (Integer) server.get(LdapConstants.CONFIG_PROP_PORT);
                     urlList.add(urlPrefix + ldapHost.trim() + ":" + ldapPort);
                 }
             }
@@ -892,24 +859,24 @@ public class LdapConnection {
             env.put(Context.PROVIDER_URL, url);
         }
 
-        String bindDN = (String) configProps.get(CONFIG_PROP_BIND_DN);
+        String bindDN = (String) configProps.get(LdapConstants.CONFIG_PROP_BIND_DN);
         // if ldapAdminDN is null or empty, not throw exception, instead, ignore it to allow anonymous users.
         if (bindDN != null && bindDN.length() > 0) {
             env.put(Context.SECURITY_PRINCIPAL, bindDN);
-            SerializableProtectedString sps = (SerializableProtectedString) configProps.get(CONFIG_PROP_BIND_PASSWORD);
+            SerializableProtectedString sps = (SerializableProtectedString) configProps.get(LdapConstants.CONFIG_PROP_BIND_PASSWORD);
             String password = sps == null ? "" : new String(sps.getChars());
             String decodedPassword = PasswordUtil.passwordDecode(password.trim());
 
             // bindPwd is mandatory
             if (decodedPassword == null || decodedPassword.length() == 0) {
-                String msg = Tr.formatMessage(tc, WIMMessageKey.MISSING_INI_PROPERTY, WIMMessageHelper.generateMsgParms(CONFIG_PROP_BIND_PASSWORD));
+                String msg = Tr.formatMessage(tc, WIMMessageKey.MISSING_INI_PROPERTY, WIMMessageHelper.generateMsgParms(LdapConstants.CONFIG_PROP_BIND_PASSWORD));
                 throw new MissingInitPropertyException(WIMMessageKey.MISSING_INI_PROPERTY, msg);
             }
             env.put(Context.SECURITY_CREDENTIALS, new ProtectedString(decodedPassword.toCharArray()));
         }
 
         // Set the ldap connection time out
-        Long cTimeout = (Long) configProps.get(CONFIG_PROP_CONNECT_TIMEOUT);
+        Long cTimeout = (Long) configProps.get(LdapConstants.CONFIG_PROP_CONNECT_TIMEOUT);
         if (cTimeout != null)
             env.put("com.sun.jndi.ldap.connect.timeout", cTimeout.toString());
         else
@@ -926,8 +893,8 @@ public class LdapConnection {
          * for backwards compatibility, support customers who might still be using it. The "referal"
          * attribute has no default so unless it is set we won't use it.
          */
-        String referal = (String) configProps.get(CONFIG_PROP_REFERAL);
-        String referral = (String) configProps.get(CONFIG_PROP_REFERRAL);
+        String referal = (String) configProps.get(LdapConstants.CONFIG_PROP_REFERAL);
+        String referral = (String) configProps.get(LdapConstants.CONFIG_PROP_REFERRAL);
         referral = referal != null ? referal : referral;
         env.put(Context.REFERRAL, referral.toLowerCase());
 

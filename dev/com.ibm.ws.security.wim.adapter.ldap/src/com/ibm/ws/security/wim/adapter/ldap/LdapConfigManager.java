@@ -36,7 +36,6 @@ import javax.naming.directory.Attributes;
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.websphere.ras.annotation.Trivial;
-import com.ibm.websphere.security.wim.ConfigConstants;
 import com.ibm.websphere.security.wim.ras.WIMMessageHelper;
 import com.ibm.websphere.security.wim.ras.WIMMessageKey;
 import com.ibm.websphere.security.wim.ras.WIMTraceHelper;
@@ -423,15 +422,15 @@ public class LdapConfigManager {
      */
     public void initialize(Map<String, Object> configProps) throws WIMException {
         final String METHODNAME = "initialize(configProps, configAdminRef)";
-        iLdapType = (String) configProps.get(ConfigConstants.CONFIG_PROP_LDAP_SERVER_TYPE);
+        iLdapType = (String) configProps.get(LdapConstants.CONFIG_PROP_LDAP_SERVER_TYPE);
         if (iLdapType == null) {
-            iLdapType = ConfigConstants.CONFIG_LDAP_IDS52;
+            iLdapType = LdapConstants.CONFIG_LDAP_IDS52;
         } else {
             iLdapType = iLdapType.toUpperCase();
         }
-        setCertificateMapMode((String) configProps.get(ConfigConstants.CONFIG_PROP_CERTIFICATE_MAP_MODE));
-        if (ConfigConstants.CONFIG_VALUE_FILTER_DESCRIPTOR_MODE.equalsIgnoreCase(getCertificateMapMode())) {
-            setCertificateFilter((String) configProps.get(ConfigConstants.CONFIG_PROP_CERTIFICATE_FILTER));
+        setCertificateMapMode((String) configProps.get(LdapConstants.CONFIG_PROP_CERTIFICATE_MAP_MODE));
+        if (LdapConstants.CONFIG_VALUE_FILTER_DESCRIPTOR_MODE.equalsIgnoreCase(getCertificateMapMode())) {
+            setCertificateFilter((String) configProps.get(LdapConstants.CONFIG_PROP_CERTIFICATE_FILTER));
         }
 
         List<HashMap<String, String>> baseEntries = new ArrayList<HashMap<String, String>>();
@@ -470,8 +469,8 @@ public class LdapConfigManager {
         }
 
         // Set the timestampFormat
-        if (configProps.containsKey(ConfigConstants.TIMESTAMP_FORMAT))
-            timestampFormat = (String) configProps.get(ConfigConstants.TIMESTAMP_FORMAT);
+        if (configProps.containsKey(LdapConstants.TIMESTAMP_FORMAT))
+            timestampFormat = (String) configProps.get(LdapConstants.TIMESTAMP_FORMAT);
         else
             timestampFormat = null;
 
@@ -492,7 +491,7 @@ public class LdapConfigManager {
 //        setRDNProperties(configProps);
         setConfidentialAttributes();
         //setGroupMemberFilter();
-        setLoginProperties((String) configProps.get(ConfigConstants.CONFIG_PROP_LOGIN_PROPERTIES));
+        setLoginProperties((String) configProps.get(LdapConstants.CONFIG_PROP_LOGIN_PROPERTIES));
         setFilters(configProps);
         setGroupMemberFilter();
 
@@ -532,10 +531,10 @@ public class LdapConfigManager {
  * }
  */
         // TODO:: This is also deleted?
-        // iNeedTranslateRDN = reposConfig.getBoolean(ConfigConstants.CONFIG_PROP_TRANSLATE_RDN);
+        // iNeedTranslateRDN = reposConfig.getBoolean(LdapConstants.CONFIG_PROP_TRANSLATE_RDN);
 
         // CUSTOM PROPERTY
-        useEncodingInSearchExpression = AccessControllerHelper.getSystemProperty(ConfigConstants.CONFIG_CUSTOM_PROP_USE_ENCODING_IN_SEARCH_EXPRESSION);
+        useEncodingInSearchExpression = AccessControllerHelper.getSystemProperty(LdapConstants.CONFIG_CUSTOM_PROP_USE_ENCODING_IN_SEARCH_EXPRESSION);
         if (useEncodingInSearchExpression != null) {
             try {
                 "string to test encoding".getBytes(useEncodingInSearchExpression);
@@ -599,21 +598,21 @@ public class LdapConfigManager {
         //name under which filters are put
         String key = null;
         if (iLdapType.equalsIgnoreCase(LdapConstants.AD_LDAP_SERVER)) {
-            key = ConfigConstants.CONFIG_ACTIVE_DIRECTORY_FILTERS;
+            key = LdapConstants.CONFIG_ACTIVE_DIRECTORY_FILTERS;
         } else if (iLdapType.equalsIgnoreCase(LdapConstants.CUSTOM_LDAP_SERVER)) {
-            key = ConfigConstants.CONFIG_CUSTOM_FILTERS;
+            key = LdapConstants.CONFIG_CUSTOM_FILTERS;
         } else if (iLdapType.equalsIgnoreCase(LdapConstants.DOMINO_LDAP_SERVER)) {
-            key = ConfigConstants.CONFIG_DOMINO_FILTERS;
+            key = LdapConstants.CONFIG_DOMINO_FILTERS;
         } else if (iLdapType.equalsIgnoreCase(LdapConstants.NOVELL_LDAP_SERVER)) {
-            key = ConfigConstants.CONFIG_NOVELL_DIRECTORY_FILTERS;
+            key = LdapConstants.CONFIG_NOVELL_DIRECTORY_FILTERS;
         } else if (iLdapType.equalsIgnoreCase(LdapConstants.IDS_LDAP_SERVER)) {
-            key = ConfigConstants.CONFIG_TDS_FILTERS;
+            key = LdapConstants.CONFIG_TDS_FILTERS;
         } else if (iLdapType.equalsIgnoreCase(LdapConstants.SUN_LDAP_SERVER)) {
-            key = ConfigConstants.CONFIG_SUN_DIRECTORY_FILTERS;
+            key = LdapConstants.CONFIG_SUN_DIRECTORY_FILTERS;
         } else if (iLdapType.equalsIgnoreCase(LdapConstants.NETSCAPE_LDAP_SERVER)) {
-            key = ConfigConstants.CONFIG_NETSCAPE_DIRECTORY_FILTERS;
+            key = LdapConstants.CONFIG_NETSCAPE_DIRECTORY_FILTERS;
         } else if (iLdapType.equalsIgnoreCase(LdapConstants.SECUREWAY_LDAP_SERVER)) {
-            key = ConfigConstants.CONFIG_SECUREWAY_DIRECTORY_FILTERS;
+            key = LdapConstants.CONFIG_SECUREWAY_DIRECTORY_FILTERS;
         } else {
             return;
         }
@@ -624,16 +623,16 @@ public class LdapConfigManager {
         if (!filterList.isEmpty()) {
             Map<String, Object> props = filterList.get(0);
 
-            if (props.get(ConfigConstants.CONFIG_USER_FILTER) != null)
-                iUserFilter = (String) props.get(ConfigConstants.CONFIG_USER_FILTER);
-            if (props.get(ConfigConstants.CONFIG_GROUP_FILTER) != null)
-                iGroupFilter = (String) props.get(ConfigConstants.CONFIG_GROUP_FILTER);
-            if (props.get(ConfigConstants.CONFIG_USER_ID_FILTER) != null)
-                iUserIdMap = (String) props.get(ConfigConstants.CONFIG_USER_ID_FILTER);
-            if (props.get(ConfigConstants.CONFIG_GROUP_ID_FILTER) != null)
-                iGroupIdMap = (String) props.get(ConfigConstants.CONFIG_GROUP_ID_FILTER);
-            if (props.get(ConfigConstants.CONFIG_GROUP_MEMBER_ID_FILTER) != null)
-                iGroupMemberIdMap = (String) props.get(ConfigConstants.CONFIG_GROUP_MEMBER_ID_FILTER);
+            if (props.get(LdapConstants.CONFIG_USER_FILTER) != null)
+                iUserFilter = (String) props.get(LdapConstants.CONFIG_USER_FILTER);
+            if (props.get(LdapConstants.CONFIG_GROUP_FILTER) != null)
+                iGroupFilter = (String) props.get(LdapConstants.CONFIG_GROUP_FILTER);
+            if (props.get(LdapConstants.CONFIG_USER_ID_FILTER) != null)
+                iUserIdMap = (String) props.get(LdapConstants.CONFIG_USER_ID_FILTER);
+            if (props.get(LdapConstants.CONFIG_GROUP_ID_FILTER) != null)
+                iGroupIdMap = (String) props.get(LdapConstants.CONFIG_GROUP_ID_FILTER);
+            if (props.get(LdapConstants.CONFIG_GROUP_MEMBER_ID_FILTER) != null)
+                iGroupMemberIdMap = (String) props.get(LdapConstants.CONFIG_GROUP_MEMBER_ID_FILTER);
             // Update the Ldap entities with search filters.
             String objectClassStr = "objectclass=";
             if (iLdapType.equalsIgnoreCase(LdapConstants.AD_LDAP_SERVER))
@@ -1100,8 +1099,8 @@ public class LdapConfigManager {
 
         Set<String> unProps = new HashSet<String>();
         Map<String, Set<String>> entityUnProps = new HashMap<String, Set<String>>();
-        Map<String, List<Map<String, Object>>> propMap = Nester.nest(configProps, ConfigConstants.CONFIG_DO_ATTRIBUTE_CONFIGUARTION);
-        List<Map<String, Object>> attrConfigList = propMap.get(ConfigConstants.CONFIG_DO_ATTRIBUTE_CONFIGUARTION);
+        Map<String, List<Map<String, Object>>> propMap = Nester.nest(configProps, LdapConstants.CONFIG_DO_ATTRIBUTE_CONFIGUARTION);
+        List<Map<String, Object>> attrConfigList = propMap.get(LdapConstants.CONFIG_DO_ATTRIBUTE_CONFIGUARTION);
 
         // Set the default attributes and then override if applicable.
         setDefaultAttributes();
@@ -1109,16 +1108,16 @@ public class LdapConfigManager {
         if (!attrConfigList.isEmpty()) {
             Map<String, Object> attrConfig = attrConfigList.get(0);
 
-            List<Map<String, Object>> attrDOs = Nester.nest(ConfigConstants.CONFIG_DO_ATTRIBUTES, attrConfig);
+            List<Map<String, Object>> attrDOs = Nester.nest(LdapConstants.CONFIG_DO_ATTRIBUTES, attrConfig);
             for (Map<String, Object> attrDO : attrDOs) {
                 addAttribute(attrDO);
             }
 
             // Read properties not supported by the LDAP repository
-            List<Map<String, Object>> propNotSupported = Nester.nest(ConfigConstants.CONFIG_DO_PROPERTIES_NOT_SUPPORTED, attrConfig);
+            List<Map<String, Object>> propNotSupported = Nester.nest(LdapConstants.CONFIG_DO_PROPERTIES_NOT_SUPPORTED, attrConfig);
             for (Map<String, Object> uPropDO : propNotSupported) {
-                String unPropName = (String) uPropDO.get(ConfigConstants.CONFIG_PROP_PROPERTY_NAME);
-                List<String> entityTypes = (List<String>) uPropDO.get(ConfigConstants.CONFIG_PROP_ENTITY_TYPES);
+                String unPropName = (String) uPropDO.get(LdapConstants.CONFIG_PROP_PROPERTY_NAME);
+                List<String> entityTypes = (List<String>) uPropDO.get(LdapConstants.CONFIG_PROP_ENTITY_TYPES);
                 if (entityTypes == null || entityTypes.size() == 0) {
                     // apply to all entity types.
                     unProps.add(unPropName);
@@ -1277,7 +1276,7 @@ public class LdapConfigManager {
     }
 
     private void addAttribute(Map<String, Object> attrDO) {
-        String attrName = (String) attrDO.get(ConfigConstants.CONFIG_PROP_NAME);
+        String attrName = (String) attrDO.get(LdapConstants.CONFIG_PROP_NAME);
         String attrKey = attrName.toLowerCase();
 
         LdapAttribute ldapAttr = iAttrNameToAttrMap.get(attrKey);
@@ -1285,10 +1284,10 @@ public class LdapConfigManager {
             ldapAttr = new LdapAttribute(attrName);
             iAttrNameToAttrMap.put(attrKey, ldapAttr);
         }
-        ldapAttr.setSyntax((String) attrDO.get(ConfigConstants.CONFIG_PROP_SYNTAX));
+        ldapAttr.setSyntax((String) attrDO.get(LdapConstants.CONFIG_PROP_SYNTAX));
 
-        String propName = (String) attrDO.get(ConfigConstants.CONFIG_PROP_PROPERTY_NAME);
-        String entityType = (String) attrDO.get(ConfigConstants.CONFIG_PROP_ENTITY_TYPE);
+        String propName = (String) attrDO.get(LdapConstants.CONFIG_PROP_PROPERTY_NAME);
+        String entityType = (String) attrDO.get(LdapConstants.CONFIG_PROP_ENTITY_TYPE);
         if (entityType == null || entityType.length() == 0) {
             if (propName != null) {
                 // apply to all entity types.
@@ -1300,18 +1299,18 @@ public class LdapConfigManager {
                 }
                 propSet.add(propName);
             }
-            if (attrDO.get(ConfigConstants.CONFIG_PROP_DEFAULT_VALUE) != null) {
+            if (attrDO.get(LdapConstants.CONFIG_PROP_DEFAULT_VALUE) != null) {
                 iDefaultValueAttrs.add(attrKey);
                 for (int j = 0; j < iLdapEntityTypeList.size(); j++) {
                     ldapAttr.setDefaultValue(iLdapEntityTypeList.get(j),
-                                             (String) attrDO.get(ConfigConstants.CONFIG_PROP_DEFAULT_VALUE));
+                                             (String) attrDO.get(LdapConstants.CONFIG_PROP_DEFAULT_VALUE));
                 }
             }
-            if (attrDO.get(ConfigConstants.CONFIG_PROP_DEFAULT_ATTRIBUTE) != null) {
+            if (attrDO.get(LdapConstants.CONFIG_PROP_DEFAULT_ATTRIBUTE) != null) {
                 iDefaultAttrAttrs.add(attrKey);
                 for (int j = 0; j < iLdapEntityTypeList.size(); j++) {
                     ldapAttr.setDefaultAttribute(iLdapEntityTypeList.get(j),
-                                                 (String) attrDO.get(ConfigConstants.CONFIG_PROP_DEFAULT_ATTRIBUTE));
+                                                 (String) attrDO.get(LdapConstants.CONFIG_PROP_DEFAULT_ATTRIBUTE));
                 }
             }
             if (propName != null) {
@@ -1329,34 +1328,34 @@ public class LdapConfigManager {
                 ldapEntity.addPropertyAttributeMap(propName, attrName);
             }
             ldapAttr.addEntityType(qTypeName);
-            if (attrDO.get(ConfigConstants.CONFIG_PROP_DEFAULT_VALUE) != null) {
+            if (attrDO.get(LdapConstants.CONFIG_PROP_DEFAULT_VALUE) != null) {
                 iDefaultValueAttrs.add(attrKey);
-                ldapAttr.setDefaultValue(qTypeName, (String) attrDO.get(ConfigConstants.CONFIG_PROP_DEFAULT_VALUE));
+                ldapAttr.setDefaultValue(qTypeName, (String) attrDO.get(LdapConstants.CONFIG_PROP_DEFAULT_VALUE));
             }
-            if (attrDO.get(ConfigConstants.CONFIG_PROP_DEFAULT_ATTRIBUTE) != null) {
+            if (attrDO.get(LdapConstants.CONFIG_PROP_DEFAULT_ATTRIBUTE) != null) {
                 iDefaultAttrAttrs.add(attrKey);
-                ldapAttr.setDefaultAttribute(qTypeName, (String) attrDO.get(ConfigConstants.CONFIG_PROP_DEFAULT_ATTRIBUTE));
+                ldapAttr.setDefaultAttribute(qTypeName, (String) attrDO.get(LdapConstants.CONFIG_PROP_DEFAULT_ATTRIBUTE));
             }
         }
     }
 
     private void setExtIdAttributes(Map<String, Object> configProps) {
         iExtIds = new HashSet<String>();
-        List<Map<String, Object>> attrConfigList = Nester.nest(ConfigConstants.CONFIG_DO_ATTRIBUTE_CONFIGUARTION, configProps);
+        List<Map<String, Object>> attrConfigList = Nester.nest(LdapConstants.CONFIG_DO_ATTRIBUTE_CONFIGUARTION, configProps);
 
         if (!attrConfigList.isEmpty()) {
             Map<String, Object> attrConfig = attrConfigList.get(0);
 
-            List<Map<String, Object>> extIds = Nester.nest(ConfigConstants.CONFIG_DO_EXTERNAL_ID_ATTRIBUTE, attrConfig);
+            List<Map<String, Object>> extIds = Nester.nest(LdapConstants.CONFIG_DO_EXTERNAL_ID_ATTRIBUTE, attrConfig);
 
             for (Map<String, Object> extIdDO : extIds) {
 
-                String attrName = (String) extIdDO.get(ConfigConstants.CONFIG_PROP_NAME);
+                String attrName = (String) extIdDO.get(LdapConstants.CONFIG_PROP_NAME);
                 LdapAttribute ldapAttr = new LdapAttribute(attrName);
-                ldapAttr.setSyntax((String) extIdDO.get(ConfigConstants.CONFIG_PROP_SYNTAX));
-                ldapAttr.setWIMGenerate((Boolean) extIdDO.get(ConfigConstants.CONFIG_PROP_AUTO_GENERATE));
+                ldapAttr.setSyntax((String) extIdDO.get(LdapConstants.CONFIG_PROP_SYNTAX));
+                ldapAttr.setWIMGenerate((Boolean) extIdDO.get(LdapConstants.CONFIG_PROP_AUTO_GENERATE));
                 iAttrNameToAttrMap.put(attrName.toLowerCase(), ldapAttr);
-                String entityType = (String) extIdDO.get(ConfigConstants.CONFIG_PROP_ENTITY_TYPE);
+                String entityType = (String) extIdDO.get(LdapConstants.CONFIG_PROP_ENTITY_TYPE);
                 if (entityType == null) {
                     for (int j = 0; j < iLdapEntities.size(); j++) {
                         iLdapEntities.get(j).setExtId(attrName);
@@ -1374,7 +1373,7 @@ public class LdapConfigManager {
         // Default extId
         String extId = null;
         String syntax = LdapConstants.LDAP_ATTR_SYNTAX_STRING;
-        if (iLdapType.startsWith(LdapConstants.IDS_LDAP_SERVER) && !iLdapType.startsWith(ConfigConstants.CONFIG_LDAP_IDS4)) {
+        if (iLdapType.startsWith(LdapConstants.IDS_LDAP_SERVER) && !iLdapType.startsWith(LdapConstants.CONFIG_LDAP_IDS4)) {
             extId = LdapConstants.LDAP_ATTR_IBMENTRYUUID;
         } else if (iLdapType.startsWith(LdapConstants.AD_LDAP_SERVER)) {
             extId = LdapConstants.LDAP_ATTR_OBJECTGUID;
@@ -1407,7 +1406,7 @@ public class LdapConfigManager {
     }
 
     private void setMembershipAttribute(Map<String, Object> groupConfig) {
-        List<Map<String, Object>> membershipPropList = Nester.nest(ConfigConstants.CONFIG_DO_MEMBERSHIP_ATTRIBUTES, groupConfig);
+        List<Map<String, Object>> membershipPropList = Nester.nest(LdapConstants.CONFIG_DO_MEMBERSHIP_ATTRIBUTES, groupConfig);
 
         if (membershipPropList.isEmpty()) {
             if (iLdapType.startsWith(LdapConstants.AD_LDAP_SERVER)) {
@@ -1421,12 +1420,12 @@ public class LdapConfigManager {
         } else {
             iDefaultMembershipAttr = false;
             Map<String, Object> mbrshipAttr = membershipPropList.get(0);
-            String name = (String) mbrshipAttr.get(ConfigConstants.CONFIG_PROP_NAME);
+            String name = (String) mbrshipAttr.get(LdapConstants.CONFIG_PROP_NAME);
             if (name.trim().length() == 0) {
                 iMembershipAttrName = null;
             } else {
                 iMembershipAttrName = name;
-                String scope = (String) mbrshipAttr.get(ConfigConstants.CONFIG_PROP_SCOPE);
+                String scope = (String) mbrshipAttr.get(LdapConstants.CONFIG_PROP_SCOPE);
                 if (scope == null) {
                     iMembershipAttrScope = LdapConstants.LDAP_DIRECT_GROUP_MEMBERSHIP;
                 } else {
@@ -1437,7 +1436,7 @@ public class LdapConfigManager {
     }
 
     private void setMemberAttributes(Map<String, Object> groupConfig) {
-        List<Map<String, Object>> memberPropList = Nester.nest(ConfigConstants.CONFIG_DO_MEMBER_ATTRIBUTES, groupConfig);
+        List<Map<String, Object>> memberPropList = Nester.nest(LdapConstants.CONFIG_DO_MEMBER_ATTRIBUTES, groupConfig);
 
         int size = memberPropList.size();
 
@@ -1460,11 +1459,11 @@ public class LdapConfigManager {
             List attrNames = new ArrayList(size);
 
             for (Map<String, Object> mbrAttrDO : memberPropList) {
-                String name = (String) mbrAttrDO.get(ConfigConstants.CONFIG_PROP_NAME);
+                String name = (String) mbrAttrDO.get(LdapConstants.CONFIG_PROP_NAME);
                 if (name != null && name.trim().length() > 0) {
-                    String objCls = (String) mbrAttrDO.get(ConfigConstants.CONFIG_PROP_OBJECT_CLASS);
-                    String scope = (String) mbrAttrDO.get(ConfigConstants.CONFIG_PROP_SCOPE);
-                    String dummy = (String) mbrAttrDO.get(ConfigConstants.CONFIG_PROP_DUMMY_MEMBER);
+                    String objCls = (String) mbrAttrDO.get(LdapConstants.CONFIG_PROP_OBJECT_CLASS);
+                    String scope = (String) mbrAttrDO.get(LdapConstants.CONFIG_PROP_SCOPE);
+                    String dummy = (String) mbrAttrDO.get(LdapConstants.CONFIG_PROP_DUMMY_MEMBER);
                     // Default scope is direct scope.
                     if (scope == null) {
                         scope = LdapConstants.LDAP_DIRECT_GROUP_MEMBERSHIP_STRING;
@@ -1534,7 +1533,7 @@ public class LdapConfigManager {
     }
 
     private void setDynaMemberAttributes(Map<String, Object> groupConfig) {
-        List<Map<String, Object>> dynaMbrAttrList = Nester.nest(ConfigConstants.CONFIG_DO_DYNAMIC_MEMBER_ATTRIBUTES, groupConfig);
+        List<Map<String, Object>> dynaMbrAttrList = Nester.nest(LdapConstants.CONFIG_DO_DYNAMIC_MEMBER_ATTRIBUTES, groupConfig);
         // String groupConfiguration = (String) configProps.get("groupProperties");
 
         LdapEntity ldapEntry = getLdapEntity(SchemaConstants.DO_GROUP);
@@ -1556,9 +1555,9 @@ public class LdapConfigManager {
         if (!dynaMbrAttrList.isEmpty()) {
 
             Map<String, Object> mbrshipAttrDO = dynaMbrAttrList.get(0);
-            String name = (String) mbrshipAttrDO.get(ConfigConstants.CONFIG_PROP_NAME);
+            String name = (String) mbrshipAttrDO.get(LdapConstants.CONFIG_PROP_NAME);
             if (name != null && name.trim().length() > 0) {
-                String objCls = (String) mbrshipAttrDO.get(ConfigConstants.CONFIG_PROP_OBJECT_CLASS);
+                String objCls = (String) mbrshipAttrDO.get(LdapConstants.CONFIG_PROP_OBJECT_CLASS);
                 if (objCls == null) {
                     // If object class is not specified, the member attr applies to all group object classes
                     for (int j = 0; j < objectClasses.size(); j++) {
@@ -1627,9 +1626,9 @@ public class LdapConfigManager {
 
             for (Map<String, Object> entityProps : entityList) {
 
-                String entityType = (String) entityProps.get(ConfigConstants.CONFIG_PROP_NAME);
-                String entityTypeSearchFilter = (String) entityProps.get(ConfigConstants.CONFIG_PROP_SEARCHFILTER);
-                String[] objectClasses = (String[]) entityProps.get(ConfigConstants.CONFIG_DO_OBJECTCLASSES);
+                String entityType = (String) entityProps.get(LdapConstants.CONFIG_PROP_NAME);
+                String entityTypeSearchFilter = (String) entityProps.get(LdapConstants.CONFIG_PROP_SEARCHFILTER);
+                String[] objectClasses = (String[]) entityProps.get(LdapConstants.CONFIG_DO_OBJECTCLASSES);
 
                 if (getLdapEntity(entityType) != null) {
                     throw new InitializationException(WIMMessageKey.DUPLICATE_ENTITY_TYPE, Tr.formatMessage(
@@ -1638,7 +1637,7 @@ public class LdapConfigManager {
                                                                                                             WIMMessageHelper.generateMsgParms(entityType)));
                 }
 
-                List<Map<String, Object>> rdnAttributes = Nester.nest(ConfigConstants.CONFIG_DO_RDN_PROPERTY, entityProps);
+                List<Map<String, Object>> rdnAttributes = Nester.nest(LdapConstants.CONFIG_DO_RDN_PROPERTY, entityProps);
 
                 if (!rdnAttributes.isEmpty()) {
                     isVMMRdnPropertiesDefined = true;
@@ -1711,7 +1710,7 @@ public class LdapConfigManager {
                     }
                 }
 
-                String[] searchBases = (String[]) entityProps.get(ConfigConstants.CONFIG_PROP_SEARCHBASES);
+                String[] searchBases = (String[]) entityProps.get(LdapConstants.CONFIG_PROP_SEARCHBASES);
                 if (searchBases != null) {
                     searchBases = validateSearchBases(searchBases, baseEntries);
                     ldapEntity.setSearchBases(searchBases);
@@ -3056,10 +3055,10 @@ public class LdapConfigManager {
     }
 
     private void setCertificateMapMode(String certMapMode) {
-        if (ConfigConstants.CONFIG_VALUE_FILTER_DESCRIPTOR_MODE.equalsIgnoreCase(certMapMode)) {
-            iCertMapMode = ConfigConstants.CONFIG_VALUE_FILTER_DESCRIPTOR_MODE;
+        if (LdapConstants.CONFIG_VALUE_FILTER_DESCRIPTOR_MODE.equalsIgnoreCase(certMapMode)) {
+            iCertMapMode = LdapConstants.CONFIG_VALUE_FILTER_DESCRIPTOR_MODE;
         } else {
-            iCertMapMode = ConfigConstants.CONFIG_VALUE_EXTACT_DN_MODE;
+            iCertMapMode = LdapConstants.CONFIG_VALUE_EXTACT_DN_MODE;
         }
     }
 

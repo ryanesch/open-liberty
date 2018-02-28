@@ -76,7 +76,6 @@ import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.websphere.ras.annotation.Trivial;
 import com.ibm.websphere.security.auth.WSSubject;
 import com.ibm.websphere.security.cred.WSCredential;
-import com.ibm.websphere.security.wim.ConfigConstants;
 import com.ibm.websphere.security.wim.Service;
 import com.ibm.websphere.security.wim.ras.WIMMessageHelper;
 import com.ibm.websphere.security.wim.ras.WIMMessageKey;
@@ -234,7 +233,7 @@ public class LdapAdapter extends BaseRepository implements ConfiguredRepository 
         reposId = (String) configProps.get(KEY_ID);
         reposRealm = (String) configProps.get(REALM);
 
-        if (String.valueOf(configProps.get(ConfigConstants.CONFIG_PROP_SUPPORT_CHANGE_LOG)).equalsIgnoreCase(ConfigConstants.CONFIG_SUPPORT_CHANGE_LOG_NATIVE)) {
+        if (String.valueOf(configProps.get(LdapConstants.CONFIG_PROP_SUPPORT_CHANGE_LOG)).equalsIgnoreCase(LdapConstants.CONFIG_SUPPORT_CHANGE_LOG_NATIVE)) {
             //Construct a change handler depending on the type of LDAP repository
             changeHandler = ChangeHandlerFactory.getChangeHandler(iLdapConn);
         }
@@ -2991,7 +2990,7 @@ public class LdapAdapter extends BaseRepository implements ConfiguredRepository 
     private LdapEntry mapCertificate(X509Certificate[] certs, LdapSearchControl srchCtrl) throws WIMException {
         LdapEntry ldapEntry = null;
         X509Certificate cert = certs[0];
-        if (ConfigConstants.CONFIG_VALUE_FILTER_DESCRIPTOR_MODE.equalsIgnoreCase(iLdapConfigMgr.getCertificateMapMode())) {
+        if (LdapConstants.CONFIG_VALUE_FILTER_DESCRIPTOR_MODE.equalsIgnoreCase(iLdapConfigMgr.getCertificateMapMode())) {
             String sFilter = iLdapConfigMgr.getCertificateLDAPFilter(cert);
 
             sFilter = sFilter.trim();
