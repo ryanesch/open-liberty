@@ -20,17 +20,14 @@
  </Designate>
 
  <OCD id="com.ibm.ws.security.acme.config.metatype" ibm:alias="acmeconfig" name="internal" description="internal use only">
-  <AD id="configParm1"                  type="String"  name="internal" description="internal use only"/>
-  <AD id="configParm2"                  type="String"  name="internal" description="internal use only"/>
+  <AD id="host"                   type="String"  name="internal" required="false"  description="internal use only"/>
+  <AD id="challengeType"          type="String"  name="internal" required="false"  default="HTTP-01" description="internal use only">
+		<Option label="%challengeType.http" value="HTTP-01" />		
+		<Option label="%challengeType.dns"  value="DNS-01" />
+  </AD>
+  <AD id="alsoRevoke"             type="Boolean" name="internal" required="false" default="false" description="internal use only"/>
+  <AD id="acceptCATermsOfService" type="Boolean" name="internal" required="true"  default="false" description="internal use only"/>
  </OCD>
 
- <Designate factoryPid="com.ibm.ws.security.acme.config.property">
-  <Object ocdref="com.ibm.ws.security.acme.config.property.metatype" />
- </Designate>   
-    
- <OCD id="com.ibm.ws.security.acme.config.property.metatype" name="internal" description="internal use only">
-  <AD id="name" type="String" required="true" name="internal" description="internal use only"/>
-  <AD id="value" type="String" required="true" name="internal" description="internal use only"/>
- </OCD>
 
 </metatype:MetaData>
