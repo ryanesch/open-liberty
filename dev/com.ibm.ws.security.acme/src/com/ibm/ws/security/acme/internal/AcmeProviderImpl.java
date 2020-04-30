@@ -14,8 +14,11 @@ import static com.ibm.ws.security.acme.internal.util.AcmeConstants.DEFAULT_ALIAS
 import static com.ibm.ws.security.acme.internal.util.AcmeConstants.DEFAULT_KEY_STORE;
 import static com.ibm.ws.security.acme.internal.util.AcmeConstants.KEY_KEYSTORE_SERVICE;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -25,6 +28,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -33,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.naming.InvalidNameException;
@@ -58,6 +64,9 @@ import com.ibm.ws.security.acme.AcmeProvider;
 import com.ibm.ws.security.acme.internal.AcmeClient.AcmeAccount;
 import com.ibm.ws.ssl.JSSEProviderFactory;
 import com.ibm.ws.ssl.KeyStoreService;
+import com.ibm.wsspi.kernel.service.location.WsLocationAdmin;
+import com.ibm.wsspi.kernel.service.location.WsLocationConstants;
+import com.ibm.wsspi.kernel.service.location.WsResource;
 
 /**
  * ACME 2.0 support component service.
@@ -81,7 +90,17 @@ public class AcmeProviderImpl implements AcmeProvider {
 
 	/** Configuration for the ACME client. */
 	private static AcmeConfig acmeConfig;
+	
+	private String workareaDir;
+	
+	@Reference
+	private com.ibm.wsspi.kernel.service.location.WsLocationAdmin wslocation;
 
+    @Reference
+    protected void setLocationService(WsLocationAdmin locationService) {
+        this.workareaDir = locationService.resolveString(WsLocationConstants.LOC_SERVER_WORKAREA_DIR);
+    }
+    
 	@Override
 	public void renewAccountKeyPair() throws AcmeCaException {
 		acmeClient.renewAccountKeyPair();
@@ -769,7 +788,7 @@ public class AcmeProviderImpl implements AcmeProvider {
 	public void updateDefaultSSLCertificate(KeyStore keyStore, File keyStoreFile, @Sensitive String password)
 			throws CertificateException {
 		try {
-			checkAndInstallCertificate(false, keyStore, keyStoreFile, password);
+			checkAndInstallCertificate(directoryURIChanged(), keyStore, keyStoreFile, password);
 		} catch (AcmeCaException e) {
 			throw new CertificateException(e.getMessage(), e);
 		}
@@ -809,6 +828,73 @@ public class AcmeProviderImpl implements AcmeProvider {
 			Tr.error(tc, e.getMessage()); // AcmeCaExceptions are localized.
 		}
 	}
+	
+	private boolean directoryURIChanged() throws AcmeCaException {
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @return True if the directoryURI has changed since the last certificate was retrieved
+	 * @throws AcmeCaException
+	 */
+	private boolean directoryURIChanged2() throws AcmeCaException {
+		File file = wslocation.getServerWorkareaResource("acme/acme.txt").asFile();
+		System.out.println("@RRE directoryURIChanged " + file.getPath());
+		Tr.debug(tc, "directoryURIChanged", "@RRE " + file.getPath());
+		String recentDirURI = acmeConfig.getDirectoryURI(); 
+		boolean fileExists = true;
+
+
+	//	File file = new File(workareaDir + "/acme.txt");
+		try {
+			file.getParentFile().mkdirs();
+	        if (file.createNewFile()) {
+	        	fileExists = false;
+	        } else {
+			    BufferedReader br = new BufferedReader(new FileReader(file));
+			    String line; 
+				while ((line = br.readLine()) != null && !line.isEmpty()) {}
+				br.close();
+				StringTokenizer tok = new StringTokenizer(line);
+				tok.nextToken();
+				tok.nextToken();
+				recentDirURI = tok.nextToken();
+	        }
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		String directoryURI = acmeConfig.getDirectoryURI();
+		
+		if (directoryURI.equals(recentDirURI)) return false;
+		
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");  
+		LocalDateTime now = LocalDateTime.now();  
+		String date = dtf.format(now);
+		  
+		X509Certificate certificate = getLeafCertificate(getConfiguredDefaultCertificateChain());
+		String serial = certificate.getSubjectX500Principal().getName();
+		
+		String accountURI = acmeClient.getAccount().getLocation().toString();
+		
+
+       	FileWriter fr;
+		try {
+			fr = new FileWriter(file, true);
+			if (!fileExists) {
+				fr.write("Date" + "\t\t" + "Serial" + "\t\t" + "DirectoryURI" + "\t\t" + "Account URI" + "\n");
+				fr.write("----------------------------------------------------------------------" + "\n");
+			}
+	       	fr.write(date + "\t\t" + serial + "\t\t" + directoryURI + "\t\t" + accountURI);
+	       	fr.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
 
 	/**
 	 * Unset the {@link AcmeConfigService} instance.
@@ -845,7 +931,7 @@ public class AcmeProviderImpl implements AcmeProvider {
 			 * We can't necessarily just check the certificate, b/c they don't
 			 * always honor them.
 			 */
-			checkAndInstallCertificate(false, null, null, null);
+			checkAndInstallCertificate(directoryURIChanged(), null, null, null);
 
 			/*
 			 * Update the account.

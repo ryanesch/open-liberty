@@ -938,13 +938,11 @@ public class AcmeClient {
 		return rootMessage;
 	}
 
-	/**
 	 * Renew the account key pair and back up the existing key pair to disk.
 	 * 
 	 * @throws AcmeCaException
 	 *             if there was an error replacing the account key pair.
 	 */
-	public void renewAccountKeyPair() throws AcmeCaException {
 
 		/*
 		 * Obtain the write lock. We will hold this the entire length of the
@@ -1058,7 +1056,6 @@ public class AcmeClient {
 	 * @throws IOException
 	 *             if there was an error copying the file.
 	 */
-	private static void copyFile(String source, String destination) throws IOException {
 		try {
 			AccessController.doPrivileged(new PrivilegedExceptionAction<Void>() {
 
