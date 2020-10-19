@@ -262,3 +262,27 @@ tlsProfiler.option-key.verbose=\
 \ \ \ \ --verbose
 tlsProfiler.option-desc.verbose=\
 \tInclude additional information about unsafe protocols.
+
+# -------- retrieveSignerFromPort OPTIONS ------------------------------------------------#
+# List of descriptive text for options. Use "\n\" for line continuations.
+# The code provides no whitespace: begin keys with "\ \ \ \ " for leading
+# whitespace, and begin descriptions with \t 
+#------------------------------\n at 72 chars -------------------------\n\#
+#------------------------------\n at 72 chars Leading "\ \ \ \ "-------\n\#
+#------------------------------\n at 72 chars Leading "\t"-------------\n\#
+retrieveSignerFromPort.desc=\
+\tRetrieve a signer certificate from a remote SSL port.
+retrieveSignerFromPort.usage.options=\
+\t{0} retrieveSignerFromPort [options]
+retrieveSignerFromPort.required-key.port=\
+\ \ \ \ --port
+retrieveSignerFromPort.required-desc.port=\
+\tSpecify the port.
+retrieveSignerFromPort.required-key.host=\
+\ \ \ \ --host
+retrieveSignerFromPort.required-desc.host=\
+\tSpecify the host.
+retrieveSignerFromPort.option-key.keystore=\
+\ \ \ \ --keystore
+retrieveSignerFromPort.option-desc.keystore=\
+\tSpecify the full path to the keystore.
