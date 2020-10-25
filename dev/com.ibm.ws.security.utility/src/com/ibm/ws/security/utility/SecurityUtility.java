@@ -23,7 +23,7 @@ import com.ibm.ws.security.utility.tasks.CreateLTPAKeysTask;
 import com.ibm.ws.security.utility.tasks.CreateSSLCertificateTask;
 import com.ibm.ws.security.utility.tasks.EncodeTask;
 import com.ibm.ws.security.utility.tasks.HelpTask;
-import com.ibm.ws.security.utility.tasks.RetrieveSignerFromPort;
+import com.ibm.ws.security.utility.tasks.RetrieveSignerFromPortTask;
 import com.ibm.ws.security.utility.tasks.TLSProfilerTask;
 import com.ibm.ws.security.utility.utils.CommandUtils;
 import com.ibm.ws.security.utility.utils.ConsoleWrapper;
@@ -165,7 +165,7 @@ public class SecurityUtility extends UtilityTemplate {
         util.registerTask(new CreateSSLCertificateTask(certCreator, fileUtil, SCRIPT_NAME));
         util.registerTask(new CreateLTPAKeysTask(ltpaKeyFileCreator, fileUtil, SCRIPT_NAME));
         util.registerTask(new TLSProfilerTask(SCRIPT_NAME));
-        util.registerTask(new RetrieveSignerFromPort(SCRIPT_NAME));
+        util.registerTask(new RetrieveSignerFromPortTask(fileUtil, SCRIPT_NAME));
 
         // Kick everything off
         int rc = util.runProgram(args).getReturnCode();
